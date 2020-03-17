@@ -16,12 +16,34 @@ public class HomeController {
 
   @GetMapping("/") // map this to the root template
   public String home(Model model) {
-    List<LocationStats> allStats = coronaVirusDataService.getAllStats();
+    List<LocationStats> allStats = coronaVirusDataService.getAllConfirmedStats();
+    List<LocationStats> allDeathStats = coronaVirusDataService.getAllDeathsStats();
+    List<LocationStats> allRecoveredStats = coronaVirusDataService.getAllRecoveredStats();
+
+    // get the total confirmed cases
     int totalConfirmedCases = allStats.stream().mapToInt(LocationStats::getLatestTotalCases).sum();
     int totalNewCases = allStats.stream().mapToInt(LocationStats::getDiffFromPreviousDay).sum();
+
+    int totalDeaths = allDeathStats.stream().mapToInt(LocationStats::getLatestTotalCases).sum();
+    int totalNewDeaths = allDeathStats.stream().mapToInt(LocationStats::getDiffFromPreviousDay).sum();
+
+    int totalRecovered = allRecoveredStats.stream().mapToInt(LocationStats::getLatestTotalCases).sum();
+    int totalNewRecovered = allRecoveredStats.stream().mapToInt(LocationStats::getDiffFromPreviousDay).sum();
+
+    // send the models to the view
     model.addAttribute("locationStats", allStats);
     model.addAttribute("totalReportedCases", totalConfirmedCases);
     model.addAttribute("totalNewCases", totalNewCases);
+
+    model.addAttribute("deathStats", allDeathStats);
+    model.addAttribute("totalDeaths", totalDeaths);
+    model.addAttribute("totalNewDeaths", totalNewDeaths);
+
+    model.addAttribute("recoveredStats", allRecoveredStats);
+    model.addAttribute("totalRecoveries", totalRecovered);
+    model.addAttribute("totalNewRecoveries", totalNewRecovered);
+
+
     return "home";
   }
 }

@@ -20,11 +20,10 @@ import org.springframework.stereotype.Service;
 public class CoronaVirusDataService {
   /** Service class to handle getting the data from a URL. */
 
-  private List<LocationStats> allStats = new ArrayList<>();
+  private List<LocationStats> allConfirmedStats = new ArrayList<>();
+  private List<LocationStats> allDeathsStats = new ArrayList<>();
+  private List<LocationStats> allRecoveredStats = new ArrayList<>();
 
-  /** Method to fetch the data from url.
-   * @param dataUrl a url to request the data from.
-   * */
   @PostConstruct // run this method as soon as the application runs
   @Scheduled(cron = "* * 1 * * *") // execute this method every day
   public void fetchVirusData() {
@@ -55,14 +54,97 @@ public class CoronaVirusDataService {
         newStats.add(stats);
       }
       // assign to class array -> we use this array to display the data
-      this.allStats = newStats;
+      this.allConfirmedStats = newStats;
 
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
     }
   }
 
-  public List<LocationStats> getAllStats() {
-    return allStats;
+  @PostConstruct // run this method as soon as the application runs
+  @Scheduled(cron = "* * 1 * * *") // execute this method every day
+  public void fetchDeathData() {
+    List<LocationStats> newStats = new ArrayList<>(); // to hold the stats of each state
+    HttpClient client = HttpClient.newHttpClient();
+    // creating a new http request
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(ConstantsUtil.VIRUS_DEATH_DATA_URL))
+        .build();
+
+    // get a response by having the client send the request
+    try {
+      HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+      // parse the body of the request from csv format to readable format
+      StringReader csvBodyReader = new StringReader(httpResponse.body());
+      Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvBodyReader);
+      for (CSVRecord record: records) {
+        // create a model with the parsed data
+        LocationStats stats = new LocationStats();
+        stats.setState(record.get("Province/State"));
+        stats.setCountry(record.get("Country/Region"));
+        // the lstest day
+        int latestCases = Integer.parseInt(record.get(record.size() - 1));
+        int prevDayCases = Integer.parseInt(record.get(record.size() - 2));
+        stats.setLatestTotalCases(latestCases);
+        stats.setDiffFromPreviousDay(prevDayCases);
+        // add to new stats
+        newStats.add(stats);
+      }
+      // assign to class array -> we use this array to display the data
+      this.allDeathsStats = newStats;
+
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @PostConstruct // run this method as soon as the application runs
+  @Scheduled(cron = "* * 1 * * *") // execute this method every day
+  public void fetchRecoveredData() {
+    List<LocationStats> newStats = new ArrayList<>(); // to hold the stats of each state
+    HttpClient client = HttpClient.newHttpClient();
+    // creating a new http request
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(ConstantsUtil.VIRUS_RECOVERED_DATA_URL))
+        .build();
+
+    // get a response by having the client send the request
+    try {
+      HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+      // parse the body of the request from csv format to readable format
+      StringReader csvBodyReader = new StringReader(httpResponse.body());
+      Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvBodyReader);
+      for (CSVRecord record: records) {
+        // create a model with the parsed data
+        LocationStats stats = new LocationStats();
+        stats.setState(record.get("Province/State"));
+        stats.setCountry(record.get("Country/Region"));
+
+        // the lstest day
+        int latestCases = Integer.parseInt(record.get(record.size() - 1));
+        int prevDayCases = Integer.parseInt(record.get(record.size() - 2));
+        stats.setLatestTotalCases(latestCases);
+        stats.setDiffFromPreviousDay(prevDayCases);
+        // add to new stats
+        newStats.add(stats);
+      }
+      // assign to class array -> we use this array to display the data
+      this.allRecoveredStats = newStats;
+
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public List<LocationStats> getAllConfirmedStats() {
+    return allConfirmedStats;
+  }
+
+  public List<LocationStats> getAllDeathsStats() {
+    return allDeathsStats;
+  }
+
+  public List<LocationStats> getAllRecoveredStats() {
+    return allRecoveredStats;
   }
 }
