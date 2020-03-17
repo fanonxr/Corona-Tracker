@@ -5,42 +5,144 @@
   <title>Corona Virus Tracker </title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <link rel="stylesheet" type="text/css" media="all" href=""/>
+
   <link rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
+
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
 <body>
 <div class="container">
 
   <h1>Corona Virus Tracker</h1>
-  <p>Confirmed Cases of the corona virus throughout the globe</p>
+  <p>
+    This application tracks the metrics behind the Corona Virus globally.
+    It only addresses the numbered of confirmed cases, deaths, and recoveries.
+    It also displays the metrics by state/province.
+  </p>
 
   <div class="jumbotron">
-    <h2 class="display-4" th:text="${totalReportedCases}"></h2>
-    <p class="lead">Total cases confirmed as of today</p>
+    <div class="row">
+      <div class="col">
+        <h2 class="display-4" th:text="${totalReportedCases}"></h2>
+        <p class="lead">Total cases confirmed as of today</p>
+      </div>
+      <div class="col">
+        <h2 class="display-4" th:text="${totalDeaths}"></h2>
+        <p class="lead">Total Death as of today</p>
+      </div>
+      <div class="col">
+        <h2 class="display-4" th:text="${totalRecoveries}"></h2>
+        <p class="lead">Total Recoveries as of today</p>
+      </div>
+    </div>
     <hr class="my-4">
-    <p>
-      <span>New cases reported since previous day:</span>
-      <span th:text="${totalNewCases}"></span>
-    </p>
+    <div class="row">
+      <div class="col">
+        <p>
+          <span>New cases reported since previous day:</span>
+          <span th:text="${totalNewCases}"></span>
+        </p>
+      </div>
+
+      <div class="col">
+        <p>
+          <span>New Deaths reported since previous day:</span>
+          <span th:text="${totalNewDeaths}"></span>
+        </p>
+      </div>
+
+      <div class="col">
+        <p>
+          <span>New Recoveries since previous day:</span>
+          <span th:text="${totalNewRecoveries}"></span>
+        </p>
+      </div>
+    </div>
   </div>
 
-  <table class="table">
-    <tr>
-      <th>State</th>
-      <th>Country</th>
-      <th>Total Cases reported</th>
-      <th>Changes since last day</th>
-    </tr>
-    <tr th:each="locationStat : ${locationStats}">
-      <td th:text="${locationStat.state}"></td>
-      <td th:text="${locationStat.country}"></td>
-      <td th:text="${locationStat.latestTotalCases}">0</td>
-      <td th:text="${locationStat.diffFromPreviousDay}">0</td>
-    </tr>
-  </table>
+  <div class="nav-items">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a href="#confirmed" class="nav-link active" data-toggle="tab">Confirmed Cases</a>
+      </li>
+      <li class="nav-item">
+        <a href="#deaths" class="nav-link" data-toggle="tab">Deaths</a>
+      </li>
+      <li class="nav-item">
+        <a href="#recovered" class="nav-link" data-toggle="tab">Recovered Cases</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="tab-content">
+
+    <div class="tab-pane fade show active" id="confirmed">
+      <div class="wrapper-table">
+        <table class="table table-bordered table-striped mb-0">
+          <tr>
+            <th>State</th>
+            <th>Country</th>
+            <th>Total Cases reported</th>
+            <th>Changes since last day</th>
+          </tr>
+          <tr th:each="locationStat : ${locationStats}">
+            <td th:text="${locationStat.state}"></td>
+            <td th:text="${locationStat.country}"></td>
+            <td th:text="${locationStat.latestTotalCases}">0</td>
+            <td th:text="${locationStat.diffFromPreviousDay}">0</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade show active" id="deaths">
+      <div class="wrapper-table">
+        <table class="table table-bordered table-striped mb-0 wrapper-table">
+          <tr>
+            <th>State</th>
+            <th>Country</th>
+            <th>Total Cases reported</th>
+            <th>Changes since last day</th>
+          </tr>
+          <tr th:each="deathStat : ${deathStats}">
+            <td th:text="${deathStat.state}"></td>
+            <td th:text="${deathStat.country}"></td>
+            <td th:text="${deathStat.latestTotalCases}">0</td>
+            <td th:text="${deathStat.diffFromPreviousDay}">0</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade show active" id="recovered">
+      <div class="wrapper-table">
+        <table class="table table-bordered table-striped mb-0 wrapper-table">
+          <tr>
+            <th>State</th>
+            <th>Country</th>
+            <th>Total Cases reported</th>
+            <th>Changes since last day</th>
+          </tr>
+          <tr th:each="recoveredStat : ${recoveredStats}">
+            <td th:text="${recoveredStat.state}"></td>
+            <td th:text="${recoveredStat.country}"></td>
+            <td th:text="${recoveredStat.latestTotalCases}">0</td>
+            <td th:text="${recoveredStat.diffFromPreviousDay}">0</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+  </div>
 
 </div>
 
